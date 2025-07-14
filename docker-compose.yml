@@ -1,0 +1,24 @@
+services:
+  #spring_app:
+  #build: .
+  #container_name: spring_app
+  #ports:
+  #- "8080:8080"
+  #depends_on:
+  #db:
+  #condition: service_healthy
+  #env_file:
+  #- .env
+
+  db:
+    image: mysql:8.0
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: projet-JEE
+    ports:
+      - "3306:3306"
+    healthcheck:
+      test: [ "CMD", "mysqladmin", "ping", "-h", "localhost" ]
+      timeout: 10s
+      retries: 5
+      interval: 5s
