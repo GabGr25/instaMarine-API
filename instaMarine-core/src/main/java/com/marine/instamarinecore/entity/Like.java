@@ -11,7 +11,9 @@ public class Like extends GenericEntity {
     private UUID userId;
     private UUID postId;
 
-    public void Like(UUID userId, UUID postId) {
+    protected Like() {}
+
+    public Like(UUID userId, UUID postId) {
         this.userId = userId;
         this.postId = postId;
         this.createdAt = Instant.now();

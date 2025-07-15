@@ -7,14 +7,14 @@ import java.time.Instant;
 import java.util.UUID;
 
 @MappedSuperclass
-public abstract class GenericEntity{
+public abstract class GenericEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
-    public UUID id;
+    private UUID id;
 
     @CreationTimestamp
-    public Instant createdAt;
+    protected Instant createdAt;
 
     public UUID getId() {
         return id;

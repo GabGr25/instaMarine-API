@@ -1,44 +1,54 @@
 package com.marine.instamarinecore.entity;
 
 import jakarta.persistence.Entity;
+import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.Instant;
 
 @Entity
 public class User extends GenericEntity {
 
-    private String accountName;
     private String username;
     private String bio;
     private String email;
     private String password;
     private String avatarUrl;
+    @UpdateTimestamp
     private Instant updatedAt;
 
-    public void User(String accountName, String username, String bio, String email, String password, String avatarUrl) {
-        this.accountName = accountName;
+    protected User() {
+    }
+
+    public User(String username, String bio, String email, String password, String avatarUrl) {
         this.username = username;
         this.bio = bio;
         this.email = email;
         this.password = password;
         this.avatarUrl = avatarUrl;
-        this.createdAt = Instant.now();
-    }
-
-    public String getAccountName() {
-        return accountName;
     }
 
     public String getUsername() {
         return username;
     }
 
+    public void setUsername(String username) {
+        this.username = username;
+    }
+
     public String getBio() {
         return bio;
     }
 
+    public void setBio(String bio) {
+        this.bio = bio;
+    }
+
     public String getEmail() {
         return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
     }
 
     private String getPassword() {
@@ -49,11 +59,11 @@ public class User extends GenericEntity {
         return avatarUrl;
     }
 
-    public Instant getUpdatedAt() {
-        return updatedAt;
+    public void setAvatarUrl(String avatarUrl) {
+        this.avatarUrl = avatarUrl;
     }
 
-    public void setUpdatedAt() {
-        this.updatedAt = Instant.now();
+    public Instant getUpdatedAt() {
+        return updatedAt;
     }
 }

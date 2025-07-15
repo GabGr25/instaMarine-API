@@ -1,6 +1,7 @@
 package com.marine.instamarinecore.entity;
 
 import jakarta.persistence.Entity;
+import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.Instant;
 import java.util.UUID;
@@ -12,13 +13,16 @@ public class Post extends GenericEntity {
     private String mediaUrl;
     private String caption;
     private String location;
+    @UpdateTimestamp
+    private Instant updatedAt;
 
-    public void Post(UUID userId, String mediaUrl, String caption, String location) {
+    protected Post() {}
+
+    public Post(UUID userId, String mediaUrl, String caption, String location) {
         this.userId = userId;
         this.mediaUrl = mediaUrl;
         this.caption = caption;
         this.location = location;
-        this.createdAt = Instant.now();
     }
 
     public UUID getUserId() {
@@ -33,7 +37,19 @@ public class Post extends GenericEntity {
         return caption;
     }
 
+    public void setCaption(String caption) {
+        this.caption = caption;
+    }
+
     public String getLocation() {
         return location;
+    }
+
+    public void setLocation(String location) {
+        this.location = location;
+    }
+
+    public Instant getUpdatedAt() {
+        return updatedAt;
     }
 }
