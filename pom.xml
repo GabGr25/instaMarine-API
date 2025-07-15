@@ -6,12 +6,13 @@
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
         <version>3.5.3</version>
-        <relativePath/> <!-- lookup parent from repository -->
+        <relativePath/>
     </parent>
 
     <groupId>com.marine</groupId>
     <artifactId>instaMarine</artifactId>
     <version>0.0.1-SNAPSHOT</version>
+    <packaging>pom</packaging>
     <name>instaMarine</name>
     <description>instaMarine</description>
 
@@ -19,12 +20,17 @@
         <java.version>21</java.version>
     </properties>
 
+    <modules>
+        <module>instaMarine-api</module>
+        <module>instaMarine-core</module>
+        <module>instaMarine-data</module>
+    </modules>
+
     <dependencies>
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter</artifactId>
         </dependency>
-
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-test</artifactId>
@@ -47,5 +53,4 @@
             </plugin>
         </plugins>
     </build>
-
 </project>
