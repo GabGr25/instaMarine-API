@@ -14,7 +14,7 @@ services:
     image: mysql:8.0
     environment:
       MYSQL_ROOT_PASSWORD: root
-      MYSQL_DATABASE: projet-JEE
+      MYSQL_DATABASE: instaMarine-db
     ports:
       - "3306:3306"
     healthcheck:

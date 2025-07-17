@@ -9,14 +9,14 @@ import java.util.UUID;
 
 public abstract class GenericService<T extends GenericEntity> {
 
-    private final GenericDAO<T> internalDAO;
-
-    public GenericDAO<T> getInternalDAO() {
-        return internalDAO;
-    }
+    protected final GenericDAO<T> internalDAO;
 
     protected GenericService(GenericDAO<T> internalDAO) {
         this.internalDAO = internalDAO;
+    }
+
+    public GenericDAO<T> getInternalDAO() {
+        return internalDAO;
     }
 
     public void deleteAll() {
@@ -27,8 +27,8 @@ public abstract class GenericService<T extends GenericEntity> {
         internalDAO.deleteById(id);
     }
 
-    public void save(final T objectToSave) {
-        internalDAO.save(objectToSave);
+    public T save(final T objectToSave) {
+        return internalDAO.save(objectToSave);
     }
 
     public long countAll() {

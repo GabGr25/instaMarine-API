@@ -66,4 +66,22 @@ public class User extends GenericEntity {
     public Instant getUpdatedAt() {
         return updatedAt;
     }
+
+    public void mergeFrom(User user) {
+        if (user.username != null) {
+            setUsername(user.username);
+        }
+
+        if (user.bio != null) {
+            setBio(user.bio);
+        }
+
+        if (user.email != null) {
+            setEmail(user.email);
+        }
+
+        if (user.avatarUrl != null) {
+            setAvatarUrl(user.avatarUrl);
+        }
+    }
 }
