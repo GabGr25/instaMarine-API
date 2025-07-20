@@ -16,7 +16,8 @@ public class Post extends GenericEntity {
     @UpdateTimestamp
     private Instant updatedAt;
 
-    protected Post() {}
+    protected Post() {
+    }
 
     public Post(UUID userId, String mediaUrl, String caption, String location) {
         this.userId = userId;
@@ -51,5 +52,15 @@ public class Post extends GenericEntity {
 
     public Instant getUpdatedAt() {
         return updatedAt;
+    }
+
+    public void mergeFrom(Post post) {
+        if (post.caption != null) {
+            setCaption(post.caption);
+        }
+
+        if (post.location != null) {
+            setLocation(post.location);
+        }
     }
 }
