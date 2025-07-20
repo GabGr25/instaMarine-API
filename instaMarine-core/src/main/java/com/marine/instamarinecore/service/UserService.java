@@ -16,11 +16,11 @@ public class UserService extends GenericService<User> {
         super(internalDAO);
     }
 
-    public User update(UUID id, User objectToUpdate) {
-        User existingUser = internalDAO.findById(id).orElseThrow(() -> new EntityNotFoundException("Object not found with id " + id));
+    public User update(UUID id, User userUpdated) {
+        User existingUser = internalDAO.findById(id).orElseThrow(() -> new EntityNotFoundException("User not found with id " + id));
 
-        existingUser.mergeFrom(objectToUpdate);
-        
+        existingUser.mergeFrom(userUpdated);
+
         return internalDAO.save(existingUser);
     }
 }
