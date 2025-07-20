@@ -2,12 +2,15 @@ package com.marine.instamarinecore.entity;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
+import jakarta.persistence.UniqueConstraint;
 
 import java.time.Instant;
 import java.util.UUID;
 
 @Entity
-@Table(name = "post_like")
+@Table(name = "post_like", uniqueConstraints = {
+        @UniqueConstraint(columnNames = {"user_id", "post_id"})
+})
 public class Like extends GenericEntity {
 
     private UUID userId;
