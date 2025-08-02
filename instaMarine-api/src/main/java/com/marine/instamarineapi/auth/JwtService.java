@@ -3,6 +3,7 @@ package com.marine.instamarineapi.auth;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.security.Key;
@@ -12,10 +13,21 @@ import java.util.UUID;
 @Service
 public class JwtService {
 
-    // Secret de 256 bits minimum pour HS256
-    //TODO .env
-    private final String SECRET = "mySecretKeyThatIsAtLeast256BitsLongForHS256Algorithm";
     private final int EXPIRATION = 86400; // 24 heures en secondes
+    // Secret de 256 bits minimum pour HS256
+    private final String SECRET;
+
+    public JwtService(@Value("${SECRET_KEY}") String secret) {
+        try {
+            byte[] keyBytes = Decoders.BASE64.decode(secret);
+            if (keyBytes.length < 32) {
+                throw new IllegalArgumentException("SECRET_KEY doit encoder au moins 256 bits");
+            }
+            this.SECRET = secret;
+        } catch (IllegalArgumentException e) {
+            throw new IllegalArgumentException("SECRET_KEY doit être en Base64 valide", e);
+        }
+    }
 
     public String generateToken(UUID userId, String username) {
         Date now = new Date();
@@ -50,10 +62,6 @@ public class JwtService {
             System.err.println("Token invalide: " + e.getMessage());
             return false;
         }
-    }
-
-    public boolean isTokenExpired(String token) {
-        return getClaims(token).getExpiration().before(new Date());
     }
 
     private Claims getClaims(String token) {
