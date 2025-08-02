@@ -34,21 +34,6 @@ public class UserController {
         }
     }
 
-    /*@PostMapping("")
-    public ResponseEntity<User> createUser(@RequestBody User user) throws URISyntaxException {
-        User createdUser = userService.save(user);
-        if (createdUser == null) {
-            return ResponseEntity.notFound().build();
-        } else {
-            URI uri = ServletUriComponentsBuilder.fromCurrentRequest()
-                    .path("/{id}")
-                    .buildAndExpand(createdUser.getId())
-                    .toUri();
-
-            return ResponseEntity.created(uri).body(createdUser);
-        }
-    }*/
-
     @PutMapping("/{id}")
     public ResponseEntity<User> updateUser(@PathVariable UUID id, @RequestBody User user) {
         User updatedUser = userService.update(id, user);
