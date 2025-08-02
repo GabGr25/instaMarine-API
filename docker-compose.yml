@@ -1,14 +1,14 @@
 services:
-  #spring_app:
-  #build: .
-  #container_name: spring_app
-  #ports:
-  #- "8080:8080"
-  #depends_on:
-  #db:
-  #condition: service_healthy
-  #env_file:
-  #- .env
+  spring_app:
+    build: .
+    container_name: spring_app
+    ports:
+      - "8080:8080"
+    depends_on:
+      db:
+        condition: service_healthy
+    env_file:
+      - .env
 
   db:
     image: mysql:8.0
