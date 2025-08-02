@@ -12,8 +12,11 @@ import java.util.UUID;
 @Transactional
 public class UserService extends GenericService<User> {
 
+    private final UserDAO userDAO;
+
     public UserService(UserDAO internalDAO) {
         super(internalDAO);
+        this.userDAO = internalDAO;
     }
 
     public User update(UUID id, User userUpdated) {
@@ -22,5 +25,17 @@ public class UserService extends GenericService<User> {
         existingUser.mergeFrom(userUpdated);
 
         return internalDAO.save(existingUser);
+    }
+
+    public boolean existsByEmail(String email) {
+        return userDAO.existsByEmail(email);
+    }
+
+    public boolean existsByUsername(String username) {
+        return userDAO.existsByUsername(username);
+    }
+
+    public User findByUsername(String username) {
+        return userDAO.findByUsername(username);
     }
 }

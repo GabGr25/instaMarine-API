@@ -4,10 +4,7 @@ import com.marine.instamarinecore.entity.User;
 import com.marine.instamarinecore.service.UserService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.util.List;
 import java.util.UUID;
 
@@ -34,21 +31,6 @@ public class UserController {
             return ResponseEntity.notFound().build();
         } else {
             return ResponseEntity.ok(user);
-        }
-    }
-
-    @PostMapping("")
-    public ResponseEntity<User> createUser(@RequestBody User user) throws URISyntaxException {
-        User createdUser = userService.save(user);
-        if (createdUser == null) {
-            return ResponseEntity.notFound().build();
-        } else {
-            URI uri = ServletUriComponentsBuilder.fromCurrentRequest()
-                    .path("/{id}")
-                    .buildAndExpand(createdUser.getId())
-                    .toUri();
-
-            return ResponseEntity.created(uri).body(createdUser);
         }
     }
 
