@@ -16,9 +16,9 @@ pipeline {
                 script {
                     withCredentials([usernamePassword(credentialsId: 'github-creds', usernameVariable: 'USERNAME', passwordVariable: 'TOKEN')]) {
                         sh '''
-                        echo $TOKEN | docker login ghcr.io -u GabGr25 --password-stdin
-                        docker build -t ghcr.io/GabGr25/instaMarine-API:latest .
-                        docker push ghcr.io/GabGr25/instaMarine-API:latest
+                        echo $TOKEN | docker login ghcr.io -u gabgr25 --password-stdin
+                        docker build -t ghcr.io/gabgr25/instamarine-api:latest .
+                        docker push ghcr.io/gabgr25/instamarine-api:latest
                         '''
                     }
                 }
