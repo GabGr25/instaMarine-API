@@ -1,13 +1,17 @@
 package com.marine.instamarineapi.controller;
 
+import com.marine.instamarineapi.auth.JwtService;
+import com.marine.instamarineapi.s3.S3Service;
 import com.marine.instamarinecore.entity.Post;
 import com.marine.instamarinecore.service.PostService;
+
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.net.URI;
-import java.net.URISyntaxException;
 import java.util.List;
 import java.util.UUID;
 
@@ -15,10 +19,14 @@ import java.util.UUID;
 @RequestMapping("/posts")
 public class PostController {
 
+    @Autowired
+    private S3Service s3Service;
+    private final JwtService jwtService;
     private final PostService postService;
 
-    public PostController(PostService postService) {
+    public PostController(PostService postService, JwtService jwtService) {
         this.postService = postService;
+        this.jwtService = jwtService;
     }
 
     @GetMapping("")
@@ -38,29 +46,59 @@ public class PostController {
     }
 
     @PostMapping("")
-    public ResponseEntity<Post> createPost(@RequestBody Post post) throws URISyntaxException {
-        Post createdPost = postService.save(post);
-        if (createdPost == null) {
-            return ResponseEntity.notFound().build();
-        } else {
+    public ResponseEntity<Post> createPost(
+            @RequestHeader("Authorization") String authHeader,
+            @RequestPart("file") MultipartFile file,
+            @RequestPart("caption") String caption,
+            @RequestPart("location") String location
+            ){
+
+        if (file.isEmpty()) {
+            return ResponseEntity.badRequest().build();
+        }
+
+        if (file.getSize() > 15 * 1024 * 1024) {
+            return ResponseEntity.badRequest().build();
+        }
+
+        try {
+            String token = authHeader.substring(7);
+            UUID userId = jwtService.getUserIdFromToken(token);
+
+            // Upload S3
+            String s3Key = userId + "/" + UUID.randomUUID() + "_" + System.currentTimeMillis() + ".webp";
+            String imageUrl = s3Service.uploadFile(s3Key, file.getInputStream(), file.getSize());
+
+            Post post = new Post(userId, imageUrl, caption, location);
+            Post createdPost = postService.save(post);
+
             URI uri = ServletUriComponentsBuilder.fromCurrentRequest()
                     .path("/{id}")
                     .buildAndExpand(createdPost.getId())
                     .toUri();
 
             return ResponseEntity.created(uri).body(createdPost);
+
+        } catch (Exception e) {
+            System.err.println("❌ Erreur dans createPost: " + e.getMessage());
+            return ResponseEntity.status(500).build();
         }
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Post> updatePost(@PathVariable UUID id, @RequestBody Post post) {
-        Post updatedPost = postService.update(id, post);
-        if (updatedPost == null) {
-            return ResponseEntity.notFound().build();
-        } else {
-            return ResponseEntity.ok(updatedPost);
-        }
+    public ResponseEntity<Post> updatePost(
+            @PathVariable UUID id,
+            @RequestBody Post post
+    ) {
+            Post updatedPost = postService.update(id, post);
+            if (updatedPost == null) {
+                return ResponseEntity.notFound().build();
+            } else {
+                return ResponseEntity.ok(updatedPost);
+            }
+
     }
+
 
     @DeleteMapping("/{id}")
     public ResponseEntity<?> deletePost(@PathVariable UUID id) {
