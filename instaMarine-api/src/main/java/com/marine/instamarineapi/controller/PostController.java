@@ -116,9 +116,7 @@ public class PostController {
         Post updatedPost = postService.update(id, post);
         PostDTO updatedPostDTO = postMapper.toPostDTO(userId, updatedPost);
         return ResponseEntity.ok(updatedPostDTO);
-
     }
-
 
     @DeleteMapping("/{id}")
     public ResponseEntity<?> deletePost(@PathVariable UUID id) {
