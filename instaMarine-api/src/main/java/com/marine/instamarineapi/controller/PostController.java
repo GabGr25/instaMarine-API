@@ -43,6 +43,16 @@ public class PostController {
         }
     }
 
+    @GetMapping("user/{id}")
+    public ResponseEntity<List<Post>> getPostsByUserId(@PathVariable UUID id) {
+        List<Post> posts = postService.getPostsByUserId(id);
+        if (posts.isEmpty()) {
+            return ResponseEntity.noContent().build();
+        } else {
+            return ResponseEntity.ok(posts);
+        }
+    }
+
     @PostMapping("")
     public ResponseEntity<?> createPost(
             @RequestHeader("Authorization") String authHeader,
