@@ -95,9 +95,7 @@ public class PostController {
         } else {
             return ResponseEntity.ok(updatedPost);
         }
-
     }
-
 
     @DeleteMapping("/{id}")
     public ResponseEntity<?> deletePost(@PathVariable UUID id) {
