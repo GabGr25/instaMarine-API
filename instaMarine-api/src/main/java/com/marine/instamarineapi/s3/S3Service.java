@@ -1,6 +1,5 @@
 package com.marine.instamarineapi.s3;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import software.amazon.awssdk.core.sync.RequestBody;
 import software.amazon.awssdk.services.s3.S3Client;
@@ -11,10 +10,12 @@ import java.io.InputStream;
 @Service
 public class S3Service {
 
-    @Autowired
-    private S3Client s3Client;
-
     private final String bucketName = System.getenv("AWS_S3_BUCKET");
+    private final S3Client s3Client;
+
+    public S3Service(S3Client s3Client) {
+        this.s3Client = s3Client;
+    }
 
     public String uploadFile(String key, InputStream inputStream, long contentLength) {
         s3Client.putObject(
