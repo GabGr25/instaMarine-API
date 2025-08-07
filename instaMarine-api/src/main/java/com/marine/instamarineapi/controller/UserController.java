@@ -1,5 +1,8 @@
 package com.marine.instamarineapi.controller;
 
+import com.marine.instamarineapi.auth.JwtService;
+import com.marine.instamarineapi.dto.UserDTO;
+import com.marine.instamarineapi.mapper.UserMapper;
 import com.marine.instamarinecore.entity.User;
 import com.marine.instamarinecore.service.UserService;
 import org.springframework.http.ResponseEntity;
@@ -13,35 +16,45 @@ import java.util.UUID;
 public class UserController {
 
     private final UserService userService;
+    private final UserMapper userMapper;
+    private final JwtService jwtService;
 
-    public UserController(UserService userService) {
+    public UserController(UserService userService, UserMapper userMapper, JwtService jwtService) {
         this.userService = userService;
+        this.userMapper = userMapper;
+        this.jwtService = jwtService;
     }
 
     @GetMapping("")
-    public ResponseEntity<List<User>> getAllUsers() {
+    public ResponseEntity<List<UserDTO>> getAllUsers() {
         List<User> users = userService.findAll();
-        return ResponseEntity.ok(users);
+        List<UserDTO> usersDTO = users.stream().map(userMapper::toUsersDTO).toList();
+        return ResponseEntity.ok(usersDTO);
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<User> getUserById(@PathVariable UUID id) {
+    public ResponseEntity<UserDTO> getUserById(
+            @RequestHeader("Authorization") String authHeader,
+            @PathVariable UUID id
+    ) {
+        String token = authHeader.substring(7);
+        UUID requesterId = jwtService.getUserIdFromToken(token);
         User user = userService.findById(id);
-        if (user == null) {
-            return ResponseEntity.notFound().build();
-        } else {
-            return ResponseEntity.ok(user);
-        }
+        UserDTO userDTO = userMapper.toUserDTO(requesterId, user);
+        return ResponseEntity.ok(userDTO);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<User> updateUser(@PathVariable UUID id, @RequestBody User user) {
+    public ResponseEntity<UserDTO> updateUser(
+            @RequestHeader("Authorization") String authHeader,
+            @PathVariable UUID id,
+            @RequestBody User user
+    ) {
+        String token = authHeader.substring(7);
+        UUID requesterId = jwtService.getUserIdFromToken(token);
         User updatedUser = userService.update(id, user);
-        if (updatedUser == null) {
-            return ResponseEntity.notFound().build();
-        } else {
-            return ResponseEntity.ok(updatedUser);
-        }
+        UserDTO updatedUserDTO = userMapper.toUserDTO(requesterId, updatedUser);
+        return ResponseEntity.ok(updatedUserDTO);
     }
 
     @DeleteMapping("/{id}")

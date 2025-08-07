@@ -1,6 +1,8 @@
 package com.marine.instamarineapi.controller;
 
 import com.marine.instamarineapi.auth.JwtService;
+import com.marine.instamarineapi.dto.PostDTO;
+import com.marine.instamarineapi.mapper.PostMapper;
 import com.marine.instamarineapi.s3.S3Service;
 import com.marine.instamarinecore.entity.Post;
 import com.marine.instamarinecore.service.PostService;
@@ -20,36 +22,53 @@ public class PostController {
     private final JwtService jwtService;
     private final PostService postService;
     private final S3Service s3Service;
+    private final PostMapper postMapper;
 
-    public PostController(PostService postService, JwtService jwtService, S3Service s3Service) {
+    public PostController(PostService postService, JwtService jwtService, S3Service s3Service, PostMapper postMapper) {
         this.postService = postService;
         this.jwtService = jwtService;
         this.s3Service = s3Service;
+        this.postMapper = postMapper;
     }
 
     @GetMapping("")
-    public ResponseEntity<List<Post>> getAllPosts() {
+    public ResponseEntity<List<PostDTO>> getAllPosts(@RequestHeader("Authorization") String authHeader) {
+        String token = authHeader.substring(7);
+        UUID requesterId = jwtService.getUserIdFromToken(token);
         List<Post> posts = postService.findAll();
-        return ResponseEntity.ok(posts);
+        List<PostDTO> postsDTO = posts.stream()
+                .map(post -> postMapper.toPostDTO(requesterId, post))
+                .toList();
+        return ResponseEntity.ok(postsDTO);
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Post> getPostById(@PathVariable UUID id) {
+    public ResponseEntity<PostDTO> getPostById(
+            @RequestHeader("Authorization") String authHeader,
+            @PathVariable UUID id
+    ) {
+        String token = authHeader.substring(7);
+        UUID requesterId = jwtService.getUserIdFromToken(token);
         Post post = postService.findById(id);
-        if (post == null) {
-            return ResponseEntity.notFound().build();
-        } else {
-            return ResponseEntity.ok(post);
-        }
+        PostDTO postDTO = postMapper.toPostDTO(requesterId, post);
+        return ResponseEntity.ok(postDTO);
     }
 
     @GetMapping("user/{id}")
-    public ResponseEntity<List<Post>> getPostsByUserId(@PathVariable UUID id) {
+    public ResponseEntity<List<PostDTO>> getPostsByUserId(
+            @RequestHeader("Authorization") String authHeader,
+            @PathVariable UUID id
+    ) {
+        String token = authHeader.substring(7);
+        UUID requesterId = jwtService.getUserIdFromToken(token);
         List<Post> posts = postService.getPostsByUserId(id);
+        List<PostDTO> postsDTO = posts.stream()
+                .map(post -> postMapper.toPostDTO(requesterId, post)
+                ).toList();
         if (posts.isEmpty()) {
             return ResponseEntity.noContent().build();
         } else {
-            return ResponseEntity.ok(posts);
+            return ResponseEntity.ok(postsDTO);
         }
     }
 
@@ -70,13 +89,14 @@ public class PostController {
 
             Post post = new Post(userId, imageUrl, caption, location);
             Post createdPost = postService.save(post);
+            PostDTO createdPostDTO = postMapper.toPostDTO(userId, createdPost);
 
             URI uri = ServletUriComponentsBuilder.fromCurrentRequest()
                     .path("/{id}")
                     .buildAndExpand(createdPost.getId())
                     .toUri();
 
-            return ResponseEntity.created(uri).body(createdPost);
+            return ResponseEntity.created(uri).body(createdPostDTO);
 
         } catch (Exception e) {
             System.err.println("❌ Erreur dans createPost: " + e.getMessage());
@@ -85,16 +105,17 @@ public class PostController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Post> updatePost(
+    public ResponseEntity<PostDTO> updatePost(
+            @RequestHeader("Authorization") String authHeader,
             @PathVariable UUID id,
             @RequestBody Post post
     ) {
+        String token = authHeader.substring(7);
+        UUID userId = jwtService.getUserIdFromToken(token);
+
         Post updatedPost = postService.update(id, post);
-        if (updatedPost == null) {
-            return ResponseEntity.notFound().build();
-        } else {
-            return ResponseEntity.ok(updatedPost);
-        }
+        PostDTO updatedPostDTO = postMapper.toPostDTO(userId, updatedPost);
+        return ResponseEntity.ok(updatedPostDTO);
     }
 
     @DeleteMapping("/{id}")
