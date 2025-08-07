@@ -44,21 +44,12 @@ public class PostController {
     }
 
     @PostMapping("")
-    public ResponseEntity<Post> createPost(
+    public ResponseEntity<?> createPost(
             @RequestHeader("Authorization") String authHeader,
             @RequestParam("file") MultipartFile file,
             @RequestParam("caption") String caption,
             @RequestParam("location") String location
     ) {
-
-        if (file.isEmpty()) {
-            return ResponseEntity.badRequest().build();
-        }
-
-        if (file.getSize() > 15 * 1024 * 1024) {
-            return ResponseEntity.badRequest().build();
-        }
-
         try {
             String token = authHeader.substring(7);
             UUID userId = jwtService.getUserIdFromToken(token);
